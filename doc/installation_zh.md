@@ -76,11 +76,13 @@ hwameistor-scheduler-6585bb5897-9xj85   1/1     Running   0          15h   172.2
 ``` bash
 # You should create a storageclass for each volume kind, i.e. LVM, DISK, RAM
 
-# LVM volume storageclass (waitforfistconsumer mode) with expansion capability
+# LVM volume storageclass (waitforfirstconsumer mode) with expansion capability
 $ kubectl apply -f deploy/storageclass-lvm.yaml
-# Disk volume storageclass (waitforfistconsumer mode) without expansion capability
+# LVM volume support HA storageclass (waitforfirstconsumer mode) with expansion capability
+$ kubectl apply -f deploy/storageclass-lvm-ha.yaml
+# Disk volume storageclass (waitforfirstconsumer mode) without expansion capability
 $ kubectl apply -f deploy/storageclass-disk.yaml
-# RAMdisk volume storageclass (waitforfistconsumer mode) without expansion capability
+# RAMdisk volume storageclass (waitforfirstconsumer mode) without expansion capability
 $ kubectl apply -f deploy/storageclass-ram.yaml
 
 # check for storageclass
@@ -88,10 +90,11 @@ $ kubectl get sc
 NAME                     PROVISIONER                 RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
 local-storage-hdd-disk   localstorage.hwameistor.io   Delete          WaitForFirstConsumer   false                  21d
 local-storage-hdd-lvm    localstorage.hwameistor.io   Delete          WaitForFirstConsumer   true                   21d
+local-storage-hdd-lvm-ha localstorage.hwameistor.io   Delete          WaitForFirstConsumer   true                   21d
 local-storage-hdd-ram    localstorage.hwameistor.io   Delete          WaitForFirstConsumer   false                  15d
 ```
 
-### 步骤 4: 创建 PVC
+### 步骤 4: 创建 non HA PVC
 
 ``` bash
 # create a test PVC with LVM local volume
