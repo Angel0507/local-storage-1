@@ -1,16 +1,16 @@
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: localstorage-disk-checker
+  name: hwameistor-disk-checker
   namespace: local-storage-system
 spec:
   selector:
     matchLabels:
-      app: localstorage-disk-checker
+      app: hwameistor-disk-checker
   template:
     metadata:
       labels:
-        app: localstorage-disk-checker
+        app: hwameistor-disk-checker
     spec:
       serviceAccount: storage-admin
       priorityClassName: system-node-critical
@@ -19,7 +19,8 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: checker
-          image: ghcr.io/hwameistor/localstorage-disk-checker:v0.0.1
+          image: ghcr.io/hwameistor/hwameistor-disk-checker:v0.0.1
+          #image: ghcr.io/hwameistor/localstorage-disk-checker:v0.0.1
           imagePullPolicy: Always
           securityContext:
             privileged: true

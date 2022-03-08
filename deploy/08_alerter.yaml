@@ -1,23 +1,24 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: localstorage-local-storage-alerter
+  name: hwameistor-alerter
   namespace: local-storage-system
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: localstorage-local-storage-alerter
+      app: hwameistor-alerter
   template:
     metadata:
       labels:
-        app: localstorage-local-storage-alerter
+        app: hwameistor-alerter
     spec:
       serviceAccount: storage-admin
       priorityClassName: system-cluster-critical
       containers:
         - name: main
-          image: ghcr.io/hwameistor/localstorage-local-storage-alerter:v0.0.1
+          #image: ghcr.io/hwameistor/localstorage-local-storage-alerter:v0.0.1
+          image: ghcr.io/hwameistor/hwameistor-alerter:v0.0.1
           imagePullPolicy: Always
           args:
             - --debug=true

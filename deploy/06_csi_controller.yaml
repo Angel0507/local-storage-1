@@ -23,7 +23,7 @@ spec:
                 operator: In
                 values:
                 - localstorage-local-storage
-            topologyKey: localstorage.hwameistor.io/local-storage-topology-node
+            topologyKey: topology.lvm.hwameistor.io/node
       serviceAccount: storage-admin
       containers:
         - name: provisioner
@@ -71,5 +71,5 @@ spec:
       volumes:
         - name: socket-dir
           hostPath:
-            path: /var/lib/kubelet/plugins/localstorage.hwameistor.io
+            path: /var/lib/kubelet/plugins/lvm.hwameistor.io
             type: DirectoryOrCreate
