@@ -56,7 +56,7 @@ spec:
         - --scheduler-name=hwameistor-scheduler
         - --leader-elect=false
         - --leader-elect-resource-name=hwameistor-scheduler
-        - --config=/etc/localstorage/scheduler-config.yaml
+        - --config=/etc/hwameistor/scheduler-config.yaml
         - --leader-elect-resource-namespace=local-storage-system  
         image: hwameistor/scheduler:v0.0.3
         imagePullPolicy: IfNotPresent
@@ -74,7 +74,7 @@ spec:
         - mountPath: /etc/kubernetes/scheduler.conf
           name: kubeconfig
           readOnly: true
-        - mountPath: /etc/localstorage/
+        - mountPath: /etc/hwameistor/
           name: hwameistor-scheduler-config
           readOnly: true
       volumes:

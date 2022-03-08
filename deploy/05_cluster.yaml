@@ -1,16 +1,16 @@
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: localstorage-local-storage
+  name: hwameistor
   namespace: local-storage-system
 spec:
   selector:
     matchLabels:
-      app: localstorage-local-storage
+      app: hwameistor
   template:
     metadata:
       labels:
-        app: localstorage-local-storage
+        app: hwameistor
     spec:
       affinity:
         nodeAffinity:
