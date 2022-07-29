@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	datacopyutil "github.com/hwameistor/local-storage/pkg/utils/datacopy"
 	"sync"
 
 	"github.com/hwameistor/local-storage/pkg/apis"
@@ -62,11 +63,16 @@ type manager struct {
 	logger *log.Entry
 
 	lock sync.Mutex
+
+	dataCopyManager *datacopyutil.DataCopyManager
+
+	rclone *datacopyutil.Rclone
 }
 
 // New cluster manager
 func New(name string, namespace string, cli client.Client, scheme *runtime.Scheme, informersCache runtimecache.Cache, systemConfig apisv1alpha1.SystemConfig) (apis.ControllerManager, error) {
-
+	dataCopyStatusCh := make(chan *datacopyutil.DataCopyStatus, 100)
+	dcm, _ := datacopyutil.NewDataCopyManager(context.TODO(), "", cli, dataCopyStatusCh)
 	return &manager{
 		name:                        name,
 		namespace:                   namespace,
@@ -85,12 +91,15 @@ func New(name string, namespace string, cli client.Client, scheme *runtime.Schem
 		volumeGroupConvertTaskQueue: common.NewTaskQueue("VolumeGroupConvertTask", maxRetries),
 		localNodes:                  map[string]apisv1alpha1.State{},
 		logger:                      log.WithField("Module", "ControllerManager"),
+		dataCopyManager:             dcm,
 	}, nil
 }
 
 func (m *manager) Run(stopCh <-chan struct{}) {
 
 	m.volumeGroupManager.Init(stopCh)
+
+	m.dataCopyManager.Run()
 
 	go m.start(stopCh)
 }

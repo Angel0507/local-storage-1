@@ -135,7 +135,6 @@ func (m *manager) processVolumeCreate(vol *apisv1alpha1.LocalVolume) error {
 
 func (m *manager) processVolumeReadyAndNotReady(vol *apisv1alpha1.LocalVolume) error {
 	logCtx := m.logger.WithFields(log.Fields{"volume": vol.Name, "state": vol.Status.State})
-	logCtx.Debug("Checking a LocalVolume")
 
 	if vol.Spec.Config == nil {
 		logCtx.Debug("No config generated, create it firstly")
@@ -182,6 +181,7 @@ func (m *manager) processVolumeReadyAndNotReady(vol *apisv1alpha1.LocalVolume) e
 	upReplicaCount := 0
 	allocatedCapacityBytes := int64(0)
 	for _, replica := range replicas {
+		log.Debugf("processVolumeReadyAndNotReady replica.Status.State = %v", replica.Status.State)
 		if replica.Status.State == apisv1alpha1.VolumeReplicaStateReady {
 			healthyReplicaCount++
 			allocatedCapacityBytes = replica.Status.AllocatedCapacityBytes
@@ -193,6 +193,7 @@ func (m *manager) processVolumeReadyAndNotReady(vol *apisv1alpha1.LocalVolume) e
 
 	// check if there are enough VolumeReplicas in ready.
 	// The new added replica should not impact the Volume health, e.g. replica migration
+	log.Debugf("processVolumeReadyAndNotReady healthyReplicaCount = %v, vol.Spec.ReplicaNumber = %v", healthyReplicaCount, vol.Spec.ReplicaNumber)
 	if healthyReplicaCount >= int(vol.Spec.ReplicaNumber) {
 		vol.Status.State = apisv1alpha1.VolumeStateReady
 		vol.Status.AllocatedCapacityBytes = allocatedCapacityBytes

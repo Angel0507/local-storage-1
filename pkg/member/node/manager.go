@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sync"
 
 	ldmv1alpha1 "github.com/hwameistor/local-disk-manager/pkg/apis/hwameistor/v1alpha1"
 	"github.com/hwameistor/local-storage/pkg/apis"
@@ -60,6 +61,8 @@ type manager struct {
 	configManager *configManager
 
 	logger *log.Entry
+
+	lock sync.Mutex
 }
 
 // New node manager

@@ -11,7 +11,7 @@ spec:
     shortNames:
     - lvmigrate
     singular: localvolumemigrate
-  scope: Namespaced
+  scope: Cluster
   versions:
   - additionalPrinterColumns:
     - description: Name of the volume to be migrated

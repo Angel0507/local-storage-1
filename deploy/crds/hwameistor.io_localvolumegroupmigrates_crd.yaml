@@ -1,17 +1,17 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: localvolumegroupmigrates.hwameistor.io
+  name: LocalVolumeGroupMigrates.hwameistor.io
 spec:
   group: hwameistor.io
   names:
     kind: LocalVolumeGroupMigrate
     listKind: LocalVolumeGroupMigrateList
-    plural: localvolumegroupmigrates
+    plural: LocalVolumeGroupMigrates
     shortNames:
-    - lvgmigrate
+    - lvmigrate
     singular: localvolumegroupmigrate
-  scope: Namespaced
+  scope: Cluster
   versions:
   - additionalPrinterColumns:
     - description: Name of the volume to be migrated
