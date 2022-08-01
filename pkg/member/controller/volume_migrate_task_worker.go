@@ -135,8 +135,6 @@ func (m *manager) processVolumeMigrate(vmNamespacedName string) error {
 		}
 	}
 
-	logCtx.Debug("processVolumeMigrate convertible = %v", convertible)
-
 	// state chain: (empty) -> Submitted -> Start -> InProgress -> Completed
 
 	// log with namespace/name is enough
@@ -592,7 +590,6 @@ func (m *manager) nonConvertibleVolumeMigrateStart(migrate *apisv1alpha1.LocalVo
 						m.apiClient.Status().Update(ctx, migrate)
 						return err
 					}
-					m.logger.Debug("nonConvertibleVolumeMigrateStart PVCToRemotePVC %v end", vol.Spec.PersistentVolumeClaimName)
 				}
 			}
 			migrate.Status.State = apisv1alpha1.OperationStateInProgress
@@ -864,7 +861,6 @@ func (m *manager) makeMigratePod(lvs []apisv1alpha1.LocalVolume, ns string) (*co
 	var volumes []corev1.Volume
 
 	for _, lv := range lvs {
-		m.logger.Debug("makeMigratePod lv = %v", lv)
 		volumeMount := corev1.VolumeMount{
 			Name: migrateVolumePrefix + lv.Spec.PersistentVolumeClaimName, MountPath: migrateVolumeMountPathPrefix + lv.Spec.PersistentVolumeClaimName,
 		}

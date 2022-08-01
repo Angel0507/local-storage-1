@@ -75,7 +75,6 @@ func (rcl *Rclone) WaitMigrateJobTaskDone(jobName, srcPVCName, dstPVCName string
 	rcl.dcm.RegisterRelatedJob(jobName, resCh)
 	defer rcl.dcm.DeregisterRelatedJob(jobName)
 
-	logger.Debug("WaitMigrateJobTaskDone test 1")
 	if waitUntilSuccess {
 		if timeout == 0 {
 			timeout = DefaultCopyTimeout
@@ -83,21 +82,15 @@ func (rcl *Rclone) WaitMigrateJobTaskDone(jobName, srcPVCName, dstPVCName string
 
 		select {
 		case res := <-resCh:
-			logger.Debug("WaitMigrateJobTaskDone test res 1= %v", res)
 			if res.Phase == DataCopyStatusFailed {
-				logger.Debug("WaitMigrateJobTaskDone test res 2= %v", res)
 				return fmt.Errorf("Failed to run job %s, message is [TODO] %s", res.JobName, res.Message)
 			} else {
-				logger.Debug("WaitMigrateJobTaskDone test res 3= %v", res)
 				return nil
 			}
 		case <-time.After(timeout):
-			logger.Debug("WaitMigrateJobTaskDone test 2")
 			return fmt.Errorf("Failed to copy data from PVC: %s to PVC: %s, timeout after %s", srcPVCName, dstPVCName, timeout)
 		}
-		logger.Debug("WaitMigrateJobTaskDone test 3")
 	}
-	logger.Debug("WaitMigrateJobTaskDone test 4")
 
 	return nil
 }
