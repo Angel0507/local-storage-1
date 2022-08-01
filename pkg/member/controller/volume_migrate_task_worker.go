@@ -298,7 +298,6 @@ func (m *manager) nonConvertibleVolumeMigrateSubmit(migrate *apisv1alpha1.LocalV
 	}
 
 	localVolumeGroupName := vol.Spec.VolumeGroup
-	logCtx.Debug("nonConvertibleVolumeMigrateSubmit localVolumeGroupName = %v", localVolumeGroupName)
 
 	lvg := &apisv1alpha1.LocalVolumeGroup{}
 	if err := m.apiClient.Get(ctx, types.NamespacedName{Namespace: migrate.Namespace, Name: localVolumeGroupName}, lvg); err != nil {
@@ -312,8 +311,6 @@ func (m *manager) nonConvertibleVolumeMigrateSubmit(migrate *apisv1alpha1.LocalV
 		return err
 	}
 
-	logCtx.Debug("nonConvertibleVolumeMigrateSubmit lvg = %v, lvg.Finalizers = %v", lvg, lvg.Finalizers)
-
 	for _, fnlr := range lvg.Finalizers {
 		if fnlr == volumeGroupFinalizer {
 			m.lock.Lock()
@@ -324,10 +321,6 @@ func (m *manager) nonConvertibleVolumeMigrateSubmit(migrate *apisv1alpha1.LocalV
 				m.logger.WithError(err).Fatal("VolumeGroupMigrateSubmit: Failed to list LocalVolumes")
 			}
 
-			logCtx.Debug("nonConvertibleVolumeMigrateSubmit start 3")
-
-			logCtx.Debug("nonConvertibleVolumeMigrateSubmit volList = %v", volList)
-
 			for _, vol := range volList.Items {
 				if vol.Spec.VolumeGroup == lvg.Name {
 					if vol.Name != migrate.Spec.VolumeName && migrate.Spec.MigrateAllVols == false {
@@ -337,15 +330,12 @@ func (m *manager) nonConvertibleVolumeMigrateSubmit(migrate *apisv1alpha1.LocalV
 					}
 				}
 			}
-			logCtx.Debug("nonConvertibleVolumeMigrateSubmit start 4")
 
 			var lvs = []apisv1alpha1.LocalVolume{}
 
 			for _, vol := range volList.Items {
 				if vol.Spec.VolumeGroup == lvg.Name {
 					pvcName := vol.Spec.PersistentVolumeClaimName
-					logCtx.Debug("nonConvertibleVolumeMigrateSubmit pvcName = %v", pvcName)
-
 					pvc := &corev1.PersistentVolumeClaim{}
 					if err := m.apiClient.Get(ctx, types.NamespacedName{Name: pvcName, Namespace: vol.Spec.PersistentVolumeClaimNamespace}, pvc); err != nil {
 						if !errors.IsNotFound(err) {
@@ -381,9 +371,6 @@ func (m *manager) nonConvertibleVolumeMigrateSubmit(migrate *apisv1alpha1.LocalV
 				}
 			}
 
-			logCtx.Debug("nonConvertibleVolumeMigrateSubmit start 5")
-
-			logCtx.Debug("nonConvertibleVolumeMigrateSubmit lvs = %v", lvs)
 			migratePod, err := m.makeMigratePod(lvs, migrate.Namespace)
 			if err != nil {
 				logCtx.WithError(err).Error("Failed to makeMigratePod")
@@ -392,7 +379,6 @@ func (m *manager) nonConvertibleVolumeMigrateSubmit(migrate *apisv1alpha1.LocalV
 				return err
 			}
 
-			logCtx.Debug("nonConvertibleVolumeMigrateSubmit start 6")
 			if err := m.apiClient.Create(ctx, migratePod); err != nil {
 				if errors.IsAlreadyExists(err) {
 					logCtx.WithError(err).Error("Failed to create MigratePod, pod already exists")
@@ -404,7 +390,6 @@ func (m *manager) nonConvertibleVolumeMigrateSubmit(migrate *apisv1alpha1.LocalV
 				}
 			}
 
-			logCtx.Debug("nonConvertibleVolumeMigrateSubmit start 7")
 			var runningTargetPod = &corev1.Pod{}
 			var podIp string
 			for {
@@ -424,8 +409,6 @@ func (m *manager) nonConvertibleVolumeMigrateSubmit(migrate *apisv1alpha1.LocalV
 				}
 			}
 
-			logCtx.Debug("nonConvertibleVolumeMigrateSubmit start 8")
-
 			err = m.makeMigrateRcloneConfigmap(podIp, migrate.Namespace)
 			if err != nil {
 				if errors.IsAlreadyExists(err) {
@@ -438,7 +421,6 @@ func (m *manager) nonConvertibleVolumeMigrateSubmit(migrate *apisv1alpha1.LocalV
 				}
 			}
 
-			logCtx.Debug("nonConvertibleVolumeMigrateSubmit start 9")
 			migrate.Status.ReplicaNumber = vol.Spec.ReplicaNumber
 			migrate.Status.State = apisv1alpha1.OperationStateSubmitted
 			m.apiClient.Status().Update(context.TODO(), migrate)
@@ -623,7 +605,7 @@ func (m *manager) nonConvertibleVolumeMigrateStart(migrate *apisv1alpha1.LocalVo
 
 func (m *manager) volumeMigrateInProgress(migrate *apisv1alpha1.LocalVolumeMigrate) error {
 	logCtx := m.logger.WithFields(log.Fields{"migration": migrate.Name, "spec": migrate.Spec, "status": migrate.Status})
-	logCtx.Debug("Start a VolumeMigrate")
+	logCtx.Debug("Start a volumeMigrateInProgress")
 
 	ctx := context.TODO()
 
@@ -743,7 +725,7 @@ func (m *manager) volumeMigrateInProgress(migrate *apisv1alpha1.LocalVolumeMigra
 
 func (m *manager) nonConvertibleVolumeMigrateInProgress(migrate *apisv1alpha1.LocalVolumeMigrate) error {
 	logCtx := m.logger.WithFields(log.Fields{"migration": migrate.Name, "spec": migrate.Spec, "status": migrate.Status})
-	logCtx.Debug("nonConvertibleVolumeMigrateInProgress Start a VolumeMigrate")
+	logCtx.Debug("Start a nonConvertibleVolumeMigrateInProgress")
 
 	ctx := context.TODO()
 
@@ -842,7 +824,7 @@ func (m *manager) volumeMigrateAbort(migrate *apisv1alpha1.LocalVolumeMigrate) e
 
 func (m *manager) nonConvertibleVolumeMigrateAbort(migrate *apisv1alpha1.LocalVolumeMigrate) error {
 	logCtx := m.logger.WithFields(log.Fields{"migration": migrate.Name, "spec": migrate.Spec, "status": migrate.Status})
-	logCtx.Debug("Abort a VolumeMigrate")
+	logCtx.Debug("Abort a nonConvertibleVolumeMigrate")
 
 	migrate.Status.State = apisv1alpha1.OperationStateAborted
 	return m.apiClient.Status().Update(context.TODO(), migrate)
@@ -857,7 +839,7 @@ func (m *manager) volumeMigrateCleanup(migrate *apisv1alpha1.LocalVolumeMigrate)
 
 func (m *manager) nonConvertibleVolumeMigrateCleanup(migrate *apisv1alpha1.LocalVolumeMigrate) error {
 	logCtx := m.logger.WithFields(log.Fields{"migration": migrate.Name, "spec": migrate.Spec, "status": migrate.Status})
-	logCtx.Debug("Cleanup a VolumeMigrate")
+	logCtx.Debug("Cleanup a nonConvertibleVolumeMigrate")
 
 	return m.apiClient.Delete(context.TODO(), migrate)
 }

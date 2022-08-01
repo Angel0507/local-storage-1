@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	datacopyutil "github.com/hwameistor/local-storage/pkg/utils/datacopy"
 	"sync"
 
 	"github.com/hwameistor/local-storage/pkg/apis"
@@ -11,6 +10,7 @@ import (
 	"github.com/hwameistor/local-storage/pkg/member/controller/scheduler"
 	"github.com/hwameistor/local-storage/pkg/member/controller/volumegroup"
 	"github.com/hwameistor/local-storage/pkg/utils"
+	datacopyutil "github.com/hwameistor/local-storage/pkg/utils/datacopy"
 
 	log "github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
